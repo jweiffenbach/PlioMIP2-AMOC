@@ -8,7 +8,7 @@ This data is available upon request from Alan M. Haywood (a.m.haywood@leeds.ac.u
 The atmospheric surface freshwater flux (precipitation minus evaporation; PmE) fields for all models except MIROC4m have been provided by Han et al. (2021).
 The links to SST reconstruction data are provided in the code and manuscript.
 
-The downloaded raw data is organized in folders as: .../Raw_data/model_name/experiment/file.extension where the experiment is either E280 (pre-industrial) or Eoi400. The processed data is then organized in the same way: .../Processed/model_name/experiment/file.extension
+The downloaded raw data is organized in folders as: .../Raw_data/model_name/experiment/file.extension where the experiment is either E280 (pre-industrial) or Eoi400 (mid-Pliocene). The processed data is then organized in the same way: .../Processed/model_name/experiment/file.extension
 
 The "Processing" folder contains all processing that has been done on raw downloaded data. It contains three subfolders: pre-processing, interpolate_3D and freshwater_transport. 
 The notebooks that are in the "Processing" folder itself contain the main processing such as the OHT separation, interpolation of surface fields and computing Atlantic zonal mean fields.
