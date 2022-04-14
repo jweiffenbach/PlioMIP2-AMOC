@@ -1,12 +1,14 @@
 # PlioMIP2-AMOC
-Codes used for analysis of the PlioMIP2 AMOC in Weiffenbach et al. (2022, in prep.)
+Codes used for analysis of the AMOC/Atlantic OHT of the PlioMIP2 ensemble in Weiffenbach et al. (2022, in prep.)
 
 This code has been used to process PlioMIP2 data and create the figures of the above manuscript, including the supplementary material. 
 
 Data provided by individual PlioMIP2 modelling groups includes the ocean potential temperature, ocean meridional velocity, ocean salinity, the Atlantic meridional streamfunction, the total Atlantic OHT and the atmospheric zonal and meridional wind at 1000 hPa.
 This data is available upon request from Alan M. Haywood (a.m.haywood@leeds.ac.uk), with the exception of IPSL-CM6A, EC-Earth3-LR and GISS2.1G. PlioMIP2 data from IPSL-CM6A, EC-Earth3-LR and GISS2.1G can be obtained from the Earth System Grid Federation (ESGF) (https://esgf-node.llnl.gov/search/cmip6/).
 The atmospheric surface freshwater flux (precipitation minus evaporation; PmE) fields for all models except MIROC4m have been provided by Han et al. (2021).
-The links to SST reconstruction data are provided in the code and manuscript. 
+The links to SST reconstruction data are provided in the code and manuscript.
+
+The downloaded raw data is organized in folders as: .../Raw_data/model_name/experiment/file.extension where the experiment is either E280 (pre-industrial) or Eoi400. The processed data is then organized in the same way: .../Processed/model_name/experiment/file.extension
 
 The "Processing" folder contains all processing that has been done on raw downloaded data. It contains three subfolders: pre-processing, interpolate_3D and freshwater_transport. 
 The notebooks that are in the "Processing" folder itself contain the main processing such as the OHT separation, interpolation of surface fields and computing Atlantic zonal mean fields.
