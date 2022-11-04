@@ -31,13 +31,13 @@ def lon180(ds):
 
 def amocstrength(model, experiment):
     "Computes AMOC strength by taking the maximum streamfunction below 500 m depth and north of 0N"
-    folder = '/Users/6497241/surfdrive/Documents/PlioMIP2-OHT/Data/Processed/'
+    folder = '/Volumes/External/DataPlioMIP2/Data/Processed/'
     dsmoc = xr.open_dataset(folder+model+'/'+experiment+'/AMOC_annual_100yr.nc')
     amoc = dsmoc.AMOC.where(dsmoc.AMOC<1e10).where(dsmoc.AMOC>-1e10).where(dsmoc.z>500).where(dsmoc.lat>0).max(dim=['z','lat'])
     return amoc 
 
 def amocstrength_100yr(model, experiment):
-    folder = '/Users/6497241/surfdrive/Documents/PlioMIP2-OHT/Data/Processed/'
+    folder = '/Volumes/External/DataPlioMIP2/Data/Processed/'
     dsmoc = xr.open_dataset(folder+model+'/'+experiment+'/AMOC_100yr.nc')
     amoc = dsmoc.AMOC.where(dsmoc.AMOC<1e10).where(dsmoc.AMOC>-1e10).where(dsmoc.z>500).where(dsmoc.lat>0).max(dim=['z','lat'])
     return amoc 
@@ -50,7 +50,7 @@ def detrend_dim(da, dim, deg=1):
 
 def corsst(model, experiment):
     "Computes Pearson correlation coefficient and associated p-value between SST field and AMOC strength"
-    folder = '/Users/6497241/surfdrive/Documents/PlioMIP2-OHT/Data/Processed/'
+    folder = '/Volumes/External/DataPlioMIP2/Data/Processed/'
     dstos = xr.open_dataset(folder+model+'/'+experiment+'/SST_annual_100yr.nc')
     
     sst = dstos.sst
@@ -61,12 +61,41 @@ def corsst(model, experiment):
         amoc = detrend_dim(amoc[3:], "time", deg=1)
         sst = detrend_dim(sst[:-3], "time", deg=1)
         cor = xr.corr(amoc, sst, dim='time')
-        pvalue = xskillscore.pearson_r_p_value(amoc, sst, dim='time', weights=None, skipna=True, keep_attrs=False)
+        pvalue = xskillscore.pearson_r_eff_p_value(amoc, sst, dim='time', skipna=True, keep_attrs=False)
     else:
         amoc = detrend_dim(amoc, "time", deg=1)
         sst = detrend_dim(sst, "time", deg=1)
         cor = xr.corr(amoc, sst, dim='time')
-        pvalue = xskillscore.pearson_r_p_value(amoc, sst, dim='time', weights=None, skipna=True, keep_attrs=False)
+        pvalue = xskillscore.pearson_r_eff_p_value(amoc, sst, dim='time', skipna=True, keep_attrs=False)
+        
+    return cor, pvalue
+
+def moving_average(x, w):
+    return np.convolve(x, np.ones(w), 'valid') / w
+
+def corsst_10rm(model, experiment):
+    "Computes Pearson correlation coefficient and associated p-value between SST field and AMOC strength"
+    folder = '/Volumes/External/DataPlioMIP2/Data/Processed/'
+    dstos = xr.open_dataset(folder+model+'/'+experiment+'/SST_annual_100yr.nc')
+    
+    sst = dstos.sst
+    amoc = amocstrength(model, experiment)
+    
+    #Shorten timeseries for CESM1.2 and EC-Earth3-LR to correct for mismatch in years in time series
+    if model == 'EC-Earth3-LR' and experiment == 'Eoi400':
+        amoc = detrend_dim(amoc[3:], "time", deg=1)
+        amoc = amoc.rolling(time=10,center=True).mean()
+        sst = detrend_dim(sst[:-3], "time", deg=1)
+        sst = sst.rolling(time=10,center=True).mean()
+        cor = xr.corr(amoc, sst, dim='time')
+        pvalue = xskillscore.pearson_r_eff_p_value(amoc, sst, dim='time', skipna=True, keep_attrs=False)
+    else:
+        amoc = detrend_dim(amoc, "time", deg=1)
+        amoc = amoc.rolling(time=10,center=True).mean()
+        sst = detrend_dim(sst, "time", deg=1)
+        sst = sst.rolling(time=10,center=True).mean()
+        cor = xr.corr(amoc, sst, dim='time')
+        pvalue = xskillscore.pearson_r_eff_p_value(amoc, sst, dim='time', skipna=True, keep_attrs=False)
         
     return cor, pvalue
 
@@ -100,7 +129,7 @@ def difmodel(dsE280var, dsEoi400var, latmin, latmax):
     return dif
 
 def oht_amoc_anomaly(modellist, latmin, latmax):
-    folder = '/Users/6497241/surfdrive/Documents/PlioMIP2-OHT/Data/Processed/'
+    folder = '/Volumes/External/DataPlioMIP2/Data/Processed/'
     lats = np.arange(-89, 90, 0.5)
     difamoc = np.zeros(len(modellist))
     difov = np.zeros(len(modellist))
@@ -130,3 +159,13 @@ def merid_gradient(variable, lat_bnds, z_bot):
     S_avg = variable.where(variable.lat>lat_bnds[2]).where(variable.lat<lat_bnds[3]).where(variable.z<z_bot).weighted(weights).mean()
     gradient = N_avg-S_avg
     return(gradient)
+
+def N_avg(variable, lat_bnds, z_bot):
+    weights = makedz(variable)
+    N_avg = variable.where(variable.lat>lat_bnds[0]).where(variable.lat<lat_bnds[1]).where(variable.z<z_bot).weighted(weights).mean()
+    return(N_avg)
+
+def S_avg(variable, lat_bnds, z_bot):
+    weights = makedz(variable)
+    S_avg = variable.where(variable.lat>lat_bnds[2]).where(variable.lat<lat_bnds[3]).where(variable.z<z_bot).weighted(weights).mean()
+    return(S_avg)
