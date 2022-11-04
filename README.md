@@ -1,5 +1,5 @@
 # PlioMIP2-AMOC
-Codes used for analysis of the AMOC/Atlantic OHT of the PlioMIP2 ensemble in Weiffenbach et al. (2022, in prep.)
+Codes used for analysis of the AMOC/Atlantic OHT of the PlioMIP2 ensemble in Weiffenbach et al. (2022, in review)
 
 This code has been used to process PlioMIP2 data and create the figures of the above manuscript, including the supplementary material. 
 
